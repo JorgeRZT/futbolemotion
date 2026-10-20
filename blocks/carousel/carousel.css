@@ -176,7 +176,7 @@
   width: 100%;
   max-width: var(--content-max-width);
   margin: 0 auto;
-  padding: 0 16px 56px;
+  padding: 0 16px 64px;
   background: none;
   align-self: center;
 }
@@ -194,6 +194,7 @@
   font-size: var(--body-font-size-m);
 }
 
+/* stylelint-disable-next-line no-descending-specificity */
 .carousel.hero .carousel-slide-content p.button-container {
   margin: 4px 4px 0 0;
 }
@@ -205,6 +206,7 @@
   background: #f7f8f9;
   color: #000;
   font-size: 15px;
+  font-weight: 600;
 }
 
 .carousel.hero .carousel-slide-content a.button:hover {

@@ -412,14 +412,15 @@ main .section.products .default-content-wrapper:first-child li a:any-link {
   display: block;
   padding: 6px 14px;
   border-radius: 20px;
-  color: var(--dark-color);
+  background: var(--light-color);
+  color: var(--text-color);
   white-space: nowrap;
 }
 
 main .section.products .default-content-wrapper:first-child li strong a:any-link {
   background: var(--text-color);
   color: #fff;
-  font-weight: 600;
+  font-weight: 800;
 }
 
 main .section.products .default-content-wrapper:last-child {
