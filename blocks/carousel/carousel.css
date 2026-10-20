@@ -227,14 +227,15 @@
 }
 
 .carousel.hero .carousel-slide-indicators {
+  flex-wrap: nowrap;
   justify-content: flex-start;
-  gap: 16px;
+  gap: 8px;
   padding: 0 20px;
   background: none;
 }
 
 .carousel.hero .carousel-slide-indicator button {
-  width: 44px;
+  width: 32px;
   height: 14px;
   border-radius: 0;
   background: linear-gradient(rgb(255 255 255 / 50%), rgb(255 255 255 / 50%)) center / 100% 3px no-repeat;
@@ -270,6 +271,10 @@
   .carousel.hero .carousel-slide-content h1,
   .carousel.hero .carousel-slide-content h2 {
     font-size: 31px;
+  }
+
+  .carousel.hero .carousel-slide-indicators {
+    gap: 16px;
   }
 
   .carousel.hero .carousel-slide-indicator button {
