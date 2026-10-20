@@ -1,0 +1,54 @@
+{
+  "definitions": [
+    {
+      "title": "Video",
+      "id": "video",
+      "model": "video",
+      "plugins": {
+        "da": {
+          "name": "video",
+          "rows": 1,
+          "columns": 1,
+          "fields": [
+            { "name": "videoUrl", "selector": "div>div>p>a[href]"},
+            { "name": "videoUrlText", "selector": "div>div>p>a"},
+            { "name": "posterImage", "selector": "div>div>picture>img[src]"}
+          ]
+        }
+      }
+    }
+  ],
+  "models": [
+    {
+      "id": "video",
+      "fields": [
+        {
+          "component": "boolean",
+          "name": "classes_autoplay",
+          "label": "Autoplay Video",
+          "valueType": "boolean"
+        },
+        {
+          "component": "text",
+          "name": "videoUrl",
+          "label": "Video URL",
+          "valueType": "string",
+          "required": true
+        },
+        {
+          "component": "text",
+          "name": "videoUrlText",
+          "label": "Video URL Text",
+          "valueType": "string"
+        },
+        {
+          "component": "reference",
+          "name": "posterImage",
+          "label": "Poster Image",
+          "valueType": "string"
+        }
+      ]
+    }
+  ],
+  "filters": []
+}
