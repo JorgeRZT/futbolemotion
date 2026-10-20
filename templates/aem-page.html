@@ -1,0 +1,104 @@
+<html>
+<head>
+<title>{{metadata.title}}</title>
+<meta name="description" content="{{metadata.description}}">
+</head>
+<body>
+<header></header>
+<main>
+{{#sections}}
+{{#carousel}}
+<div>
+<div class="carousel {{variant}}">
+{{#slides}}<div><div><picture><img src="{{image.src}}" alt="{{image.alt}}"></picture></div><div><h2>{{title}}</h2><p>{{text}}</p>{{#ctas}}<p><strong><a href="{{href}}">{{label}}</a></strong></p>{{/ctas}}</div></div>
+{{/slides}}
+</div>
+<div class="section-metadata"><div><div>style</div><div>{{style}}</div></div></div>
+</div>
+{{/carousel}}
+{{#productList}}
+<div>
+<ul>{{#tabs}}<li>{{#active}}<strong>{{/active}}<a href="{{href}}">{{label}}</a>{{#active}}</strong>{{/active}}</li>{{/tabs}}</ul>
+<div class="cards products">
+{{#products}}<div><div><picture><img src="{{image.src}}" alt="{{image.alt}}"></picture></div><div>{{#badge}}<p><em>{{badge}}</em></p>{{/badge}}<h3><a href="{{href}}">{{name}}</a></h3><p><strong>{{price}}</strong></p></div></div>
+{{/products}}
+</div>
+<p><em><a href="{{cta.href}}">{{cta.label}}</a></em></p>
+<div class="section-metadata"><div><div>style</div><div>products</div></div></div>
+</div>
+{{/productList}}
+{{#banners}}
+<div>
+<div class="columns {{variant}}"><div>{{#items}}<div><p><picture><img src="{{image.src}}" alt="{{image.alt}}"></picture></p><h2>{{title}}</h2><p>{{text}}</p><p><em><a href="{{cta.href}}">{{cta.label}}</a></em></p></div>{{/items}}</div></div>
+<div class="section-metadata"><div><div>style</div><div>{{style}}</div></div></div>
+</div>
+{{/banners}}
+{{#players}}
+<div>
+<h2>{{title}}</h2>
+<div class="cards players">
+{{#items}}<div><div><picture><img src="{{image.src}}" alt="{{image.alt}}"></picture></div><div><h3>{{name}}</h3><p>{{boot}}</p><p><strong><a href="{{cta.href}}">{{cta.label}}</a></strong></p></div></div>
+{{/items}}
+</div>
+</div>
+{{/players}}
+{{#recommender}}
+<div>
+<p><picture><img src="{{background.src}}" alt=""></picture></p>
+<h2>{{title}}</h2>
+<p>{{text}}</p>
+<div class="cards recommender">
+{{#items}}<div><div><picture><img src="{{image.src}}" alt="{{image.alt}}"></picture></div><div><h3><a href="{{href}}">{{label}}</a></h3></div></div>
+{{/items}}
+</div>
+<div class="section-metadata"><div><div>style</div><div>{{style}}</div></div></div>
+</div>
+{{/recommender}}
+{{#categories}}
+<div>
+<h2>{{title}}</h2>
+<div class="cards {{variant}}">
+{{#items}}<div><div><picture><img src="{{image.src}}" alt="{{image.alt}}"></picture></div><div><h3><a href="{{href}}">{{label}}</a></h3></div></div>
+{{/items}}
+</div>
+</div>
+{{/categories}}
+{{#blog}}
+<div>
+<h2>{{title}}</h2>
+<div class="cards blog">
+{{#items}}<div><div><picture><img src="{{image.src}}" alt="{{image.alt}}"></picture></div><div><p><em>{{category}}</em></p><h3><a href="{{href}}">{{title}}</a></h3><p>{{excerpt}}</p><p>{{date}}</p></div></div>
+{{/items}}
+</div>
+</div>
+{{/blog}}
+{{#ratings}}
+<div>
+<p><strong>{{title}}</strong></p>
+<p>:star::star::star::star::star: <strong>{{score}}</strong> / 5</p>
+<p>{{reviews}} opiniones · {{criteria}}</p>
+<p><a href="{{cta.href}}">{{cta.label}}</a></p>
+<div class="section-metadata"><div><div>style</div><div>{{style}}</div></div></div>
+</div>
+{{/ratings}}
+{{#seo}}
+<div>
+<p><picture><img src="{{background.src}}" alt=""></picture></p>
+<h1>{{title}}</h1>
+<p>{{text}}</p>
+<div class="section-metadata"><div><div>style</div><div>{{style}}</div></div></div>
+</div>
+{{/seo}}
+{{/sections}}
+<div>
+<div class="metadata">
+<div><div>Title</div><div>{{metadata.title}}</div></div>
+<div><div>Description</div><div>{{metadata.description}}</div></div>
+<div><div>Source</div><div>AEM Sites {{path}} + Adobe Commerce</div></div>
+<div><div>Robots</div><div>noindex, nofollow</div></div>
+</div>
+</div>
+</main>
+<footer></footer>
+</body>
+</html>
