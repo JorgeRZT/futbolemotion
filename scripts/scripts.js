@@ -17,6 +17,24 @@ import {
   toCamelCase,
 } from './aem.js';
 
+export const NX_ORIGIN = 'https://da.live/nx';
+
+/**
+ * Moves Universal Editor instrumentation (data-aue-*, data-richtext-*) between elements,
+ * so blocks that rebuild their DOM stay editable when the page is served by AEM author.
+ * @param {Element} from source element
+ * @param {Element} to target element
+ */
+export function moveInstrumentation(from, to) {
+  [...from.attributes]
+    .map(({ nodeName }) => nodeName)
+    .filter((attr) => attr.startsWith('data-aue-') || attr.startsWith('data-richtext-'))
+    .forEach((attr) => {
+      to?.setAttribute(attr, from.getAttribute(attr));
+      from.removeAttribute(attr);
+    });
+}
+
 /**
  * Builds hero block and prepends to main in a new section.
  * @param {Element} main The container element
@@ -228,5 +246,5 @@ loadPage();
 
   const exp = searchParams.get('daexperiment');
   // eslint-disable-next-line import/no-unresolved
-  if (exp) import('https://da.live/nx/public/plugins/exp/exp.js');
+  if (exp) import(`${NX_ORIGIN}/public/plugins/exp/exp.js`);
 }());

@@ -9,6 +9,16 @@
         "da": {
           "rows": 1,
           "columns": 2
+        },
+        "xwalk": {
+          "page": {
+            "resourceType": "core/franklin/components/block/v1/block",
+            "template": {
+              "name": "Cards",
+              "model": "cards",
+              "filter": "cards"
+            }
+          }
         }
       }
     },
@@ -21,15 +31,65 @@
           "rows": 1,
           "columns": 2,
           "fields": [
-            { "name": "image", "selector": "div:nth-child(1)>picture>img[src]"},
-            { "name": "imageAlt", "selector": "div:nth-child(1)>picture>img[alt]"},
-            { "name": "text", "selector": "div:nth-child(2)" }
+            {
+              "name": "image",
+              "selector": "div:nth-child(1)>picture>img[src]"
+            },
+            {
+              "name": "imageAlt",
+              "selector": "div:nth-child(1)>picture>img[alt]"
+            },
+            {
+              "name": "text",
+              "selector": "div:nth-child(2)"
+            }
           ]
+        },
+        "xwalk": {
+          "page": {
+            "resourceType": "core/franklin/components/block/v1/block/item",
+            "template": {
+              "name": "Card",
+              "model": "card"
+            }
+          }
         }
       }
     }
   ],
   "models": [
+    {
+      "id": "cards",
+      "fields": [
+        {
+          "component": "multiselect",
+          "name": "classes",
+          "label": "Variante",
+          "options": [
+            {
+              "name": "Productos",
+              "value": "products"
+            },
+            {
+              "name": "Jugadores",
+              "value": "players"
+            },
+            {
+              "name": "Recomendador",
+              "value": "recommender"
+            },
+            {
+              "name": "Categorías",
+              "value": "categories"
+            },
+            {
+              "name": "Blog",
+              "value": "blog"
+            }
+          ]
+        }
+      ]
+    },
     {
       "id": "card",
       "fields": [

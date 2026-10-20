@@ -11,6 +11,15 @@
           "rows": 1,
           "columns": 2,
           "behaviour": "columns"
+        },
+        "xwalk": {
+          "page": {
+            "resourceType": "core/franklin/components/columns/v1/columns",
+            "template": {
+              "columns": "2",
+              "rows": "1"
+            }
+          }
         }
       }
     },
@@ -43,6 +52,17 @@
     {
       "id": "columns",
       "fields": [
+        {
+          "component": "multiselect",
+          "name": "classes",
+          "label": "Variante",
+          "options": [
+            {
+              "name": "Banners",
+              "value": "banners"
+            }
+          ]
+        },
         {
           "component": "number",
           "valueType": "number",

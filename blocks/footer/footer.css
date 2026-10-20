@@ -124,6 +124,7 @@ footer .footer-main {
 }
 
 footer .footer-main .columns > div {
+  align-items: flex-start;
   gap: 32px;
 }
 
@@ -215,8 +216,4 @@ footer .footer-legal ul a {
   footer .footer-main .columns > div > div:first-child p:first-child {
     font-size: 27px;
   }
-}
-
-footer .footer-main .columns > div {
-  align-items: flex-start;
 }

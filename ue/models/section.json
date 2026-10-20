@@ -6,6 +6,14 @@
       "plugins": {
         "da": {
           "unsafeHTML": "<div></div>"
+        },
+        "xwalk": {
+          "page": {
+            "resourceType": "core/franklin/components/section/v1/section",
+            "template": {
+              "model": "section"
+            }
+          }
         }
       },
       "filter": "section",
@@ -22,8 +30,28 @@
           "label": "Style",
           "options": [
             {
-              "name": "Highlight",
-              "value": "highlight"
+              "name": "Ancho completo",
+              "value": "full-width"
+            },
+            {
+              "name": "Centrado",
+              "value": "centered"
+            },
+            {
+              "name": "Productos",
+              "value": "products"
+            },
+            {
+              "name": "Recomendador",
+              "value": "recommender"
+            },
+            {
+              "name": "Valoraciones",
+              "value": "ratings"
+            },
+            {
+              "name": "SEO",
+              "value": "seo"
             }
           ]
         }
@@ -49,7 +77,8 @@
         "table",
         "text",
         "video",
-        "product-recommendations"
+        "product-recommendations",
+        "product-list"
       ]
     }
   ]

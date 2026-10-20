@@ -1,1 +1,3 @@
 helix-importer-ui
+plugins/experimentation/tests
+plugins/experimentation/playwright.config.js
