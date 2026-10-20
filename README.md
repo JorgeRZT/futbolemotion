@@ -1,4 +1,4 @@
-# Fútbol Emotion · Edge Delivery Services + AEM Sites + Adobe Commerce (rama `aem`)
+# Fútbol Emotion · Edge Delivery Services + AEM Sites + Adobe Commerce (rama `da`)
 
 Demo de la home de [futbolemotion.com](https://www.futbolemotion.com) migrada a **Experience Workspace (Edge Delivery Services + DA)**.
 
@@ -6,6 +6,8 @@ Demo de la home de [futbolemotion.com](https://www.futbolemotion.com) migrada a 
 |---|---|---|
 | `main` | Migración de la landing con contenido en DA. **Congelada.** | https://main--futbolemotion--jorgerzt.aem.page/ |
 | `aem` | Mismo código, más la composición y el contenido servidos desde AEM Sites (simulado), productos de Adobe Commerce y edición en Universal Editor | https://aem--futbolemotion--jorgerzt.aem.page/ |
+| `edge` | Igual que `aem`, pero la página de AEM se renderiza con **AEM Edge Functions** en el CDN de Adobe | https://edge--futbolemotion--jorgerzt.aem.page/ |
+| `da` | Igual que `aem`, pero el JSON de la página está **alojado en DA** (`/da-json-to-content/`) en lugar de en my-custom-api | https://da--futbolemotion--jorgerzt.aem.page/json-from-da |
 
 > Demo con `noindex, nofollow`. Nada está publicado en `.aem.live`.
 
@@ -69,6 +71,77 @@ Demo de la home de [futbolemotion.com](https://www.futbolemotion.com) migrada a 
   - se ignoran los tests de `plugins/experimentation`;
   - stylelint: se desactiva `no-descending-specificity` y se unifica un selector duplicado en el footer.
 - El workflow de CI pasa en verde.
+
+## JSON alojado en DA (rama `da`)
+
+En esta variante, el JSON de la página no viene de my-custom-api ni de AEM, sino de un **fichero `.json` alojado en Document Authoring**. El render sigue haciéndose en el servidor con json2html y la misma plantilla [`templates/aem-page.html`](templates/aem-page.html).
+
+```
+da.live/#/jorgerzt/futbolemotion/da-json-to-content/json-from-da.json
+        │  admin.da.live/source/…  (Authorization reenviada desde el preview)
+        ▼
+json2html (overlay) + templates/aem-page.html  →  HTML de EDS
+        │  preview
+        ▼
+https://da--futbolemotion--jorgerzt.aem.page/json-from-da
+```
+
+| | |
+|---|---|
+| Fichero en DA | [`/da-json-to-content/json-from-da.json`](https://da.live/#/jorgerzt/futbolemotion/da-json-to-content) |
+| URL en EDS | https://da--futbolemotion--jorgerzt.aem.page/json-from-da |
+| Formato del JSON | El mismo que el modelo de página de AEM (`metadata`, `sections[]`…). Ver *Contrato del JSON* más abajo |
+| Render | json2html en el **preview**. El navegador no hace ninguna llamada a DA ni a ninguna API |
+
+**Entrada añadida a la configuración de json2html:**
+```json
+{
+  "path": "/json-from-da",
+  "endpoint": "https://admin.da.live/source/jorgerzt/futbolemotion/da-json-to-content/{{id}}.json",
+  "regex": "/[^/]+$/",
+  "template": "/templates/aem-page.html",
+  "forwardHeaders": ["Authorization"]
+}
+```
+
+**Por qué funciona así:**
+- **No se puede previsualizar el `.json` directamente en EDS.** EDS solo admite JSON con formato *sheet* (hojas de cálculo de DA); con uno anidado devuelve `invalid sheet; unknown type`.
+- **`content.da.live` exige autenticación** (devuelve 401). Por eso json2html lee el fichero desde `admin.da.live/source/…` y reenvía la cabecera `Authorization` que la Admin API de EDS le pasa durante el preview (`forwardHeaders`). Así no se guarda ningún token en la configuración.
+- **El overlay es común a todo el sitio** y apunta a la clave `/aem` de json2html. Por eso la entrada `/json-from-da` está registrada en la configuración `jorgerzt/futbolemotion/aem`, igual que `/example-from-aem-and-commerce`. Como el contenido es común a todas las ramas, la página también se ve en `aem--` y en `main--`.
+
+**Cómo probarlo:**
+1. Abre https://da--futbolemotion--jorgerzt.aem.page/json-from-da. El título es «JSON desde DA», hay 32 tarjetas y no se hace ninguna llamada a APIs desde el cliente.
+2. Edita el JSON y súbelo de nuevo a DA. Puedes hacerlo desde da.live o con la API:
+   ```bash
+   curl -X PUT -H "Authorization: Bearer $IMS_TOKEN" \
+     -F "data=@json-from-da.json;type=application/json" \
+     https://admin.da.live/source/jorgerzt/futbolemotion/da-json-to-content/json-from-da.json
+   ```
+3. Lanza el preview **con tu sesión de Adobe**, desde el Sidekick o con la API. La credencial es la que json2html reenvía a DA:
+   ```bash
+   curl -X POST -H "Authorization: Bearer $IMS_TOKEN" \
+     https://admin.hlx.page/preview/jorgerzt/futbolemotion/da/json-from-da
+   ```
+4. Recarga la página: el cambio aparece sin tocar el código.
+5. **Para añadir otra página:**
+   - sube `/da-json-to-content/<slug>.json`;
+   - añade `{"path":"/<slug>", …}` a la configuración de json2html (POST del **array completo** a `…/config/jorgerzt/futbolemotion/aem`);
+   - lanza el preview de `/<slug>`.
+
+**Contrato del JSON:**
+```jsonc
+{
+  "jcr:title": "…", "path": "…", "lastModified": "ISO-8601",
+  "metadata": { "title": "…", "description": "…", "commerceEndpoint": "…" },
+  "sections": [   // una clave por sección; el orden del array es el orden en la página
+    { "carousel": { "slides": [ … ] } }, { "productList": { "products": [ … ] } },
+    { "banners": { … } }, { "players": { … } }, { "recommender": { … } },
+    { "categories": { … } }, { "blog": { … } }, { "ratings": { … } }, { "seo": { … } }
+  ]
+}
+```
+
+> **Limitación:** el preview necesita una sesión con acceso de lectura a DA. Un preview lanzado sin login, o un token que no sea de IMS, hace que json2html reciba un 401 de DA. Para producción conviene que el JSON se genere como *sheet* de DA (y usar `arrayKey`/`pathKey`) o servirlo desde un origen público.
 
 ## Endpoints simulados (my-custom-api)
 
