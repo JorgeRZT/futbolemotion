@@ -100,6 +100,94 @@ navegador → Adobe CDN ── /example-from-aem-and-commerce ──► Edge Fun
 - Se configura en el config store `config_default`: `EDS_ORIGIN`, `AEM_MODEL_URL`, `TEMPLATE`, `AEM_PAGES`, `CACHE_TTL` y `PASSTHROUGH` (este último solo en local).
 - El código de la función no se publica en EDS: `edge-functions/` está en `.hlxignore` y en `.eslintignore`.
 
+### Especificación de `fe-aem-render`
+
+**Identificación**
+
+| Campo | Valor |
+|---|---|
+| Nombre | `fe-aem-render` (máx. 30 caracteres; hay un máximo de 3 funciones por programa EDS) |
+| Runtime | Fastly Compute (WebAssembly) · `@fastly/js-compute` ^3.46 · Mustache ^4.2 |
+| Declaración | [`config/edgeFunctions.yaml`](edge-functions/config/edgeFunctions.yaml) (`kind: EdgeFunctions`) |
+| Routing | [`config/cdn.yaml`](edge-functions/config/cdn.yaml): regla `aem-pages-to-edge-function` → `selectAemOrigin` con `originName: edgefunction-fe-aem-render` |
+| Artefacto | `aio aem edge-functions build` → `pkg/futbolemotion-edge-functions.tar.gz` |
+
+**Configuración** (config store `config_default`; si falta una clave se usa el valor por defecto de `src/index.js`)
+
+| Clave | Por defecto | Descripción |
+|---|---|---|
+| `EDS_ORIGIN` | `https://edge--futbolemotion--jorgerzt.aem.live` | Origen EDS del que se leen `head.html`, la plantilla y, en caso de fallback, la página. En local se usa `.aem.page` |
+| `AEM_MODEL_URL` | `…/api/futbolemotion/aem/content/futbolemotion/es/{path}.model.json` | URL del modelo de página de AEM (Sling Model Exporter). `{path}` se sustituye por el slug |
+| `TEMPLATE` | `/templates/aem-page.html` | Plantilla Mustache, servida desde el code bus de la rama |
+| `AEM_PAGES` | `example-from-aem-and-commerce` | Slugs, separados por comas, que se renderizan desde AEM. Debe coincidir con `cdn.yaml` |
+| `CACHE_TTL` | `300` | `max-age` (en segundos) de la página renderizada |
+| `PASSTHROUGH` | `false` | `true` hace de proxy al origen para el resto de rutas. Solo para uso en local |
+| `LOG_LEVEL` | `info` | Nivel de log de `lib/log.js` |
+
+**Flujo de una petición**
+1. El CDN aplica `cdn.yaml`: si la ruta está en la lista, la petición va a la función; si no, va directamente a EDS.
+2. `aemPathFor()` quita las barras inicial y final del path y lo compara con `AEM_PAGES`. Solo se aceptan peticiones `GET`.
+3. Lanza 3 subpeticiones en paralelo, cada una cacheada 60 s en el CDN (`CacheOverride`):
+   - `AEM_MODEL_URL` (`accept: application/json`);
+   - `EDS_ORIGIN + TEMPLATE` (`accept: text/html`);
+   - `EDS_ORIGIN + /head.html`.
+4. `renderPage()` hace `Mustache.render(template, model)` e inserta `head.html` justo antes de `</head>`.
+5. Devuelve el HTML. En el navegador, `scripts/aem.js` decora los bloques como en cualquier página EDS.
+
+**Contrato de entrada (modelo AEM)**
+```jsonc
+{
+  "jcr:title": "…", "path": "/content/futbolemotion/es/…", "template": "…", "lastModified": "ISO-8601",
+  "metadata": { "title": "…", "description": "…", "commerceEndpoint": "…" },
+  "sections": [            // orden = orden de las secciones en la página
+    { "carousel":    { "resourceType": "futbolemotion/components/carousel", "variant": "…", "style": "…", "slides": [ … ] } },
+    { "productList": { "resourceType": "futbolemotion/components/commerce/product-list", "products": [ … ] } },
+    { "banners":     { "resourceType": "futbolemotion/components/columns", … } },
+    { "players":     { "resourceType": "futbolemotion/components/contentfragmentlist", … } },
+    { "recommender": { … } }, { "categories": { … } }, { "blog": { … } }, { "ratings": { … } }, { "seo": { … } }
+  ]
+}
+```
+- Cada sección tiene una sola clave, que la plantilla usa para elegir el bloque (`{{#carousel}}`, `{{#productList}}`, etc.). Si una clave no está en la plantilla, se ignora.
+- Los productos llegan **ya resueltos** desde Commerce (nombre, precio, imagen y enlace). La función no llama a Catalog Service.
+
+**Contrato de salida**
+
+| Caso | Status | Cuerpo | Cabeceras |
+|---|---|---|---|
+| Renderizado correcto | 200 | HTML completo de EDS (`<head>` con `head.html` y meta tags; `<main>` con secciones y bloques) | `content-type: text/html; charset=utf-8`, `cache-control: public, max-age=CACHE_TTL`, `x-robots-tag: noindex, nofollow`, `x-rendered-by: aem-edge-function`, `x-aem-source: <model.path>` |
+| AEM, la plantilla o `head.html` fallan (status distinto de 2xx, JSON no válido o timeout) | El del origen | La página que EDS tenga guardada en esa ruta (DA / json2html) | Las del origen (sin `x-rendered-by`) |
+| Ruta no configurada y `PASSTHROUGH=true` | El del origen | Proxy a `EDS_ORIGIN` | Las del origen |
+| Ruta no configurada y `PASSTHROUGH=false`, o método distinto de GET | 404 | `Not Found!` (`lib/response.notFound()`) | — |
+| Error inesperado | 500 | `Internal Server Error` (`lib/response.error()`) | — |
+
+**Caché**
+- Subpeticiones (modelo, plantilla y `head.html`): 60 s.
+- Página renderizada: `CACHE_TTL` (300 s).
+- Un cambio en AEM tarda como mucho unos 6 min en verse, o se ve al momento con `aio aem edge-functions purge-cache`.
+
+**Seguridad y SEO**
+- Solo se escapan `& < > " '`. Mustache, por defecto, también escapa `/`, lo que rompía las URLs.
+- Las secciones vienen de AEM, una fuente de confianza; aun así, la plantilla solo usa `{{ }}` (escapado) y nunca `{{{ }}}`.
+- La función no guarda secretos. Si AEM requiere autenticación, el token se configura en un secret store, nunca en el repo.
+- Lleva `noindex` mientras sea una demo.
+
+**Observabilidad**
+- `lib/log.js` escribe un JSON con el método, la URL y el status en el endpoint de logs `customerHttps`. Con `LOG_LEVEL=debug` añade las cabeceras de petición y de respuesta.
+- Si se cae al fallback, escribe `render failed, falling back to origin: <error>`.
+- En producción: `aio aem edge-functions tail-logs`.
+
+**Tests** (`npm test`, mocha)
+- `renderPage`: renderiza modelo y plantilla e inserta `head.html`.
+- `aemPathFor`: solo acepta las rutas configuradas (con o sin barra final).
+- `response-test.js`: helpers de respuesta del boilerplate.
+
+**Añadir una página nueva desde AEM**
+1. Publica su `<slug>.model.json` (o crea el mock).
+2. Añade el slug a `AEM_PAGES`.
+3. Añade la ruta a `in:` en `cdn.yaml`.
+4. Vuelve a desplegar la config y la función.
+
 ### Probarlo en local
 ```bash
 npm install --prefix ~/.local/aio @adobe/aio-cli          # o: npm i -g @adobe/aio-cli
