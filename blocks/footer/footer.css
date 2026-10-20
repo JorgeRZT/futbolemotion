@@ -1,20 +1,222 @@
 footer {
-  background-color: var(--light-color);
-  font-size: var(--body-font-size-xs);
+  padding: 24px 0 0;
+  background-color: var(--background-color);
+  font-size: var(--body-font-size-s);
 }
 
 footer .footer > div {
+  max-width: var(--content-max-width);
   margin: auto;
-  max-width: 1200px;
-  padding: 40px 24px 24px;
 }
 
-footer .footer p {
+footer .footer .section > div {
+  padding: 0 16px;
+}
+
+footer .footer p,
+footer .footer ul {
   margin: 0;
 }
 
+footer .footer ul {
+  padding: 0;
+  list-style: none;
+}
+
+footer a:any-link {
+  color: var(--text-color);
+}
+
+/* brands strip */
+footer .footer-brands ul {
+  display: flex;
+  gap: 10px 28px;
+  padding: 0 0 20px;
+  overflow-x: auto;
+  border-bottom: 1px solid #e5e5e5;
+  scrollbar-width: none;
+}
+
+footer .footer-brands li {
+  flex: 0 0 auto;
+  font-weight: 800;
+  font-size: 18px;
+  letter-spacing: -0.02em;
+  text-transform: lowercase;
+}
+
+footer .footer-brands li a {
+  color: #8a8a8a;
+}
+
+footer .footer-brands li:last-child {
+  margin-left: auto;
+  font-weight: 400;
+  font-size: var(--body-font-size-xs);
+  text-transform: none;
+}
+
+/* popular links */
+footer .footer-links ul {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px 16px;
+  padding: 32px 0;
+}
+
+footer .footer-links li:last-child {
+  font-weight: 700;
+}
+
+/* member card */
+footer .footer-member .default-content-wrapper {
+  display: grid;
+  gap: 16px;
+  margin: 0 16px;
+  padding: 32px 24px;
+  border-radius: 16px;
+  background: linear-gradient(180deg, #000 0%, #2e2416 100%);
+  color: #fff;
+}
+
+footer .footer-member h2 {
+  margin: 0;
+  font-size: 30px;
+  font-weight: 400;
+  line-height: 1.1;
+}
+
+footer .footer-member h2 strong {
+  font-weight: 800;
+}
+
+footer .footer-member ul li {
+  position: relative;
+  padding: 4px 0 4px 28px;
+}
+
+footer .footer-member ul li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 8px;
+  width: 16px;
+  height: 16px;
+  background: url('../../icons/check.svg') center / contain no-repeat;
+}
+
+footer .footer-member a.button:any-link {
+  margin: 0;
+  background: #f2f3f5;
+  color: var(--text-color);
+  font-size: var(--body-font-size-xs);
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+footer .footer-member p.button-container {
+  margin: 0;
+}
+
+/* main columns */
+footer .footer-main {
+  padding: 32px 0;
+}
+
+footer .footer-main .columns > div {
+  gap: 32px;
+}
+
+footer .footer-main .columns > div > div:first-child p:first-child {
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+footer .footer-main .columns > div > div:first-child p:has(.footer-badge) {
+  display: inline-block;
+  margin: 24px 16px 0 0;
+}
+
+footer .footer-badge img {
+  width: auto;
+  height: 54px;
+  border-radius: 6px;
+  background: #000;
+}
+
+footer .footer-main h3 {
+  margin: 0 0 20px;
+  font-size: var(--body-font-size-m);
+  font-weight: 600;
+}
+
+footer .footer-main ul li {
+  padding: 6px 0;
+}
+
+footer .footer-main .columns > div > div:last-child p {
+  font-size: var(--body-font-size-xs);
+}
+
+footer .footer-main .columns > div > div:last-child p + p {
+  margin-top: 16px;
+  font-weight: 700;
+}
+
+/* legal bar */
+footer .footer-legal {
+  border-top: 1px solid #ddd;
+}
+
+footer .footer-legal .default-content-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 24px;
+  padding: 20px 16px 32px;
+  font-size: var(--body-font-size-s);
+}
+
+footer .footer-legal ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+}
+
+footer .footer-legal ul a {
+  font-weight: 700;
+}
+
 @media (width >= 900px) {
-  footer .footer > div {
-    padding: 40px 32px 24px;
+  footer .footer-links ul {
+    grid-template-columns: repeat(6, 1fr);
   }
+
+  footer .footer-member .default-content-wrapper {
+    grid-template-columns: 1fr 1.2fr 1fr;
+    align-items: center;
+    padding: 56px 48px;
+  }
+
+  footer .footer-member h2 {
+    font-size: 40px;
+  }
+
+  footer .footer-member p.button-container {
+    justify-self: end;
+  }
+
+  footer .footer-main .columns > div > div:first-child {
+    flex: 1.8;
+    padding-right: 64px;
+  }
+
+  footer .footer-main .columns > div > div:first-child p:first-child {
+    font-size: 27px;
+  }
+}
+
+footer .footer-main .columns > div {
+  align-items: flex-start;
 }

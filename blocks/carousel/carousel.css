@@ -151,3 +151,126 @@
     --slide-content-width: auto;
   }
 }
+
+/* hero variant (Fútbol Emotion home banner) */
+.carousel.hero {
+  position: relative;
+}
+
+.carousel.hero .carousel-slide {
+  justify-content: flex-end;
+  min-height: 0;
+  aspect-ratio: 3 / 4;
+  max-height: calc(100svh - var(--header-height));
+}
+
+.carousel.hero .carousel-slide .carousel-slide-image picture::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgb(0 0 0 / 55%) 0%, transparent 55%);
+}
+
+.carousel.hero .carousel-slide .carousel-slide-content {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: var(--content-max-width);
+  margin: 0 auto;
+  padding: 0 16px 56px;
+  background: none;
+  align-self: center;
+}
+
+.carousel.hero .carousel-slide-content h1,
+.carousel.hero .carousel-slide-content h2 {
+  margin: 0 0 6px;
+  color: #fff;
+  font-size: 28px;
+  line-height: 1.1;
+}
+
+.carousel.hero .carousel-slide-content p {
+  margin: 0 0 8px;
+  font-size: var(--body-font-size-m);
+}
+
+.carousel.hero .carousel-slide-content p.button-container {
+  margin: 4px 4px 0 0;
+}
+
+.carousel.hero .carousel-slide-content a.button:any-link {
+  margin: 0;
+  padding: 7px 12px;
+  border: 0;
+  background: #f7f8f9;
+  color: #000;
+  font-size: 15px;
+}
+
+.carousel.hero .carousel-slide-content a.button:hover {
+  background: #fff;
+}
+
+.carousel.hero .carousel-navigation-buttons {
+  display: none;
+}
+
+.carousel.hero nav {
+  position: absolute;
+  bottom: 24px;
+  left: 0;
+  right: 0;
+  max-width: var(--content-max-width);
+  margin: auto;
+}
+
+.carousel.hero .carousel-slide-indicators {
+  justify-content: flex-start;
+  gap: 16px;
+  padding: 0 20px;
+  background: none;
+}
+
+.carousel.hero .carousel-slide-indicator button {
+  width: 44px;
+  height: 14px;
+  border-radius: 0;
+  background: linear-gradient(rgb(255 255 255 / 50%), rgb(255 255 255 / 50%)) center / 100% 3px no-repeat;
+}
+
+.carousel.hero .carousel-slide-indicator button:disabled,
+.carousel.hero .carousel-slide-indicator button:hover,
+.carousel.hero .carousel-slide-indicator button:focus-visible {
+  background: linear-gradient(#fff, #fff) center / 100% 3px no-repeat;
+}
+
+@media (width >= 600px) {
+  .carousel.hero .carousel-slide {
+    aspect-ratio: 16 / 9;
+  }
+
+  .carousel.hero .carousel-slide .carousel-slide-content {
+    --slide-content-width: 100%;
+
+    margin: 0 auto;
+  }
+}
+
+@media (width >= 900px) {
+  .carousel.hero .carousel-slide {
+    aspect-ratio: 3 / 1;
+  }
+
+  .carousel.hero .carousel-slide .carousel-slide-content {
+    padding-bottom: 64px;
+  }
+
+  .carousel.hero .carousel-slide-content h1,
+  .carousel.hero .carousel-slide-content h2 {
+    font-size: 31px;
+  }
+
+  .carousel.hero .carousel-slide-indicator button {
+    width: 60px;
+  }
+}

@@ -31,3 +31,62 @@
     order: unset;
   }
 }
+
+/* banners variant: image with centered overlay text */
+.columns.banners > div {
+  gap: 0;
+}
+
+.columns.banners > div > div {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 3 / 2;
+  overflow: hidden;
+  color: #fff;
+  text-align: center;
+  isolation: isolate;
+}
+
+.columns.banners > div > div > p:has(> picture:only-child) {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  z-index: -1;
+}
+
+.columns.banners picture img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.columns.banners h2 {
+  margin: 0 0 4px;
+  color: #fff;
+  font-size: var(--heading-font-size-xl);
+  text-shadow: 0 1px 8px rgb(0 0 0 / 30%);
+}
+
+.columns.banners p {
+  margin: 0;
+}
+
+.columns.banners p.button-container {
+  margin-top: 12px;
+}
+
+.columns.banners a.button:any-link {
+  margin: 0;
+  padding: 6px 12px;
+  border: 1px solid #fff;
+  background: transparent;
+  color: #fff;
+  font-size: 15px;
+}
+
+.columns.banners a.button:hover {
+  background: rgb(255 255 255 / 15%);
+}

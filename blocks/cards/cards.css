@@ -25,3 +25,279 @@
   aspect-ratio: 4 / 3;
   object-fit: cover;
 }
+
+/* shared: horizontal scrollers */
+.cards.products > ul,
+.cards.players > ul,
+.cards.categories > ul,
+.cards.blog > ul {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: thin;
+  padding-bottom: 16px;
+}
+
+.cards.products > ul > li,
+.cards.players > ul > li,
+.cards.categories > ul > li,
+.cards.blog > ul > li,
+.cards.recommender > ul > li {
+  position: relative;
+  scroll-snap-align: start;
+  border: 0;
+}
+
+.cards.products h3 a::after,
+.cards.categories h3 a::after,
+.cards.blog h3 a::after,
+.cards.recommender h3 a::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+}
+
+/* products */
+.cards.products > ul > li {
+  flex: 0 0 calc(50% - 5px);
+}
+
+.cards.products .cards-card-image {
+  background: var(--light-color);
+}
+
+.cards.products > ul > li img {
+  aspect-ratio: 1;
+  object-fit: contain;
+  mix-blend-mode: multiply;
+}
+
+.cards.products .cards-card-body {
+  margin: 12px 4px;
+}
+
+.cards.products .cards-card-body p,
+.cards.products .cards-card-body h3 {
+  margin: 0 0 6px;
+}
+
+.cards.products .cards-card-body em {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 12px;
+  background: var(--badge-color);
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+.cards.products h3 {
+  font-size: var(--body-font-size-m);
+  font-weight: 400;
+  line-height: 1.3;
+}
+
+.cards.products h3 a:any-link {
+  color: var(--text-color);
+}
+
+.cards.products .cards-card-body strong {
+  font-size: 18px;
+  font-weight: 800;
+}
+
+/* players ("Viste como los cracks") */
+.cards.players > ul > li {
+  flex: 0 0 75%;
+  overflow: hidden;
+  border-radius: 6px;
+  color: #fff;
+  text-align: center;
+}
+
+.cards.players > ul > li img {
+  aspect-ratio: 3 / 4;
+}
+
+.cards.players .cards-card-image::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgb(0 0 0 / 85%) 0%, transparent 45%);
+}
+
+.cards.players .cards-card-body {
+  position: absolute;
+  inset: auto 0 0;
+  z-index: 1;
+  margin: 0;
+  padding: 0 16px 32px;
+}
+
+.cards.players h3 {
+  margin: 0 0 6px;
+  color: #fff;
+  font-size: 26px;
+}
+
+.cards.players .cards-card-body p {
+  margin: 0;
+}
+
+.cards.players p.button-container {
+  margin-top: 12px;
+}
+
+.cards.players a.button:any-link {
+  margin: 0;
+  padding: 6px 12px;
+  border: 0;
+  background: #fff;
+  color: #000;
+  font-size: 15px;
+}
+
+/* recommender */
+.cards.recommender > ul {
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.cards.recommender > ul > li {
+  overflow: hidden;
+  border-radius: 12px;
+  background: transparent;
+}
+
+.cards.recommender > ul > li img {
+  aspect-ratio: 220 / 390;
+}
+
+.cards.recommender .cards-card-body {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  padding: 16px 12px;
+}
+
+.cards.recommender h3 {
+  margin: 0;
+  font-size: 22px;
+  writing-mode: vertical-rl;
+}
+
+.cards.recommender h3 a:any-link {
+  color: #fff;
+}
+
+.cards.recommender .cards-card-body::after {
+  content: '';
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  width: 38px;
+  height: 38px;
+  border: 1px solid #fff;
+  border-radius: 50%;
+  background: url('../../icons/arrow.svg') center / 20px no-repeat;
+}
+
+/* categories */
+.cards.categories > ul > li {
+  flex: 0 0 40%;
+  text-align: center;
+}
+
+.cards.categories > ul > li img {
+  aspect-ratio: 1;
+  object-fit: contain;
+}
+
+.cards.categories .cards-card-body {
+  margin: 8px 0;
+}
+
+.cards.categories h3 {
+  display: inline-block;
+  margin: 0;
+  padding: 6px 12px;
+  border-radius: 20px;
+  background: var(--light-color);
+  font-size: var(--body-font-size-m);
+  font-weight: 600;
+}
+
+.cards.categories h3 a:any-link {
+  color: var(--text-color);
+}
+
+/* blog */
+.cards.blog > ul > li {
+  flex: 0 0 82%;
+}
+
+.cards.blog > ul > li img {
+  aspect-ratio: 3 / 2;
+  border-radius: 8px;
+}
+
+.cards.blog .cards-card-body {
+  margin: 12px 0;
+}
+
+.cards.blog .cards-card-body p {
+  margin: 0 0 8px;
+  font-size: var(--body-font-size-s);
+}
+
+.cards.blog .cards-card-body p:first-child em {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 12px;
+  background: var(--light-color);
+  font-style: normal;
+  font-size: var(--body-font-size-xs);
+  font-weight: 600;
+}
+
+.cards.blog h3 {
+  margin: 0 0 8px;
+  font-size: var(--heading-font-size-m);
+}
+
+.cards.blog h3 a:any-link {
+  color: var(--text-color);
+}
+
+.cards.blog .cards-card-body p:last-child {
+  color: var(--dark-color);
+  font-size: var(--body-font-size-xs);
+}
+
+@media (width >= 900px) {
+  .cards.products > ul > li {
+    flex-basis: calc((100% - 40px) / 4.5);
+  }
+
+  .cards.players > ul > li {
+    flex-basis: calc((100% - 40px) / 4.3);
+  }
+
+  .cards.categories > ul > li {
+    flex-basis: calc((100% - 60px) / 5.6);
+  }
+
+  .cards.blog > ul > li {
+    flex-basis: calc((100% - 30px) / 4);
+  }
+
+  .cards.recommender > ul {
+    gap: 30px;
+  }
+
+  .cards.recommender h3 {
+    font-size: 26px;
+  }
+}
