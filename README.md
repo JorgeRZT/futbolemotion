@@ -232,28 +232,30 @@ Los generadores de estos mocks (Python + chevron) están fuera del repo, en el w
 ## Cómo probarlo
 
 ### 1. Ver la página renderizada desde AEM + Commerce
-Abre https://aem--futbolemotion--jorgerzt.aem.page/example-from-aem-and-commerce
+Abre https://edge--futbolemotion--jorgerzt.aem.page/example-from-aem-and-commerce
 
 Comprueba:
 - **El HTML llega completo desde el servidor:**
   ```bash
-  curl -s https://aem--futbolemotion--jorgerzt.aem.page/example-from-aem-and-commerce | grep -c '<h3'          # 32 tarjetas
-  curl -s https://aem--futbolemotion--jorgerzt.aem.page/example-from-aem-and-commerce | grep 'name="source"'  # AEM Sites + Adobe Commerce
+  curl -s https://edge--futbolemotion--jorgerzt.aem.page/example-from-aem-and-commerce | grep -c '<h3'          # 32 tarjetas
+  curl -s https://edge--futbolemotion--jorgerzt.aem.page/example-from-aem-and-commerce | grep 'name="source"'  # AEM Sites + Adobe Commerce
   ```
 - **No hay llamadas desde el cliente:** en DevTools → Network no aparece ninguna petición a `workers.dev` ni a `graphql`.
 - **El origen de la página es el overlay:**
-  `https://admin.hlx.page/status/jorgerzt/futbolemotion/aem/example-from-aem-and-commerce` (con login) debe mostrar `sourceLocation: markup:https://json2html.adobeaem.workers.dev/...`. En la home, el `sourceLocation` sigue siendo DA.
+  `https://admin.hlx.page/status/jorgerzt/futbolemotion/edge/example-from-aem-and-commerce` (con login) debe mostrar `sourceLocation: markup:https://json2html.adobeaem.workers.dev/...`. En la home, el `sourceLocation` sigue siendo DA.
 
 ### 2. Cambiar el contenido "en AEM" y verlo en EDS
 1. Edita el JSON del endpoint `…/example-from-aem-and-commerce.model.json` en my-custom-api. Por ejemplo, cambia un título del carrusel o el precio de un producto.
 2. Vuelve a lanzar el preview de la página. Puedes usar el Sidekick (**Preview**) o el Admin API:
    ```bash
    curl -X POST -H "Authorization: Bearer $IMS_TOKEN" \
-     https://admin.hlx.page/preview/jorgerzt/futbolemotion/aem/example-from-aem-and-commerce
+     https://admin.hlx.page/preview/jorgerzt/futbolemotion/edge/example-from-aem-and-commerce
    ```
 3. Recarga la página en `aem.page`: el cambio aparece sin desplegar código.
 
 ### 3. Probar json2html directamente
+> El `/aem` de estas URLs es la clave con la que se registró la configuración de json2html, no la rama que se visualiza. El overlay es común a todo el sitio, así que el preview desde `edge--` también pasa por esa misma configuración.
+
 ```bash
 curl -H "Authorization: Bearer $IMS_TOKEN" \
   https://json2html.adobeaem.workers.dev/jorgerzt/futbolemotion/aem/example-from-aem-and-commerce
@@ -270,7 +272,7 @@ Una ruta no configurada devuelve 404, y entonces EDS sirve el contenido desde DA
 3. Lanza el preview de `/<pagina>`.
 
 ### 5. Universal Editor
-- **Sobre DA, hoy:** `https://aem--futbolemotion--jorgerzt.ue.da.live/` (requiere UE habilitado en la org).
+- **Sobre DA, hoy:** `https://edge--futbolemotion--jorgerzt.ue.da.live/` (requiere UE habilitado en la org).
 - **Sobre AEM Sites:** con un entorno author y la configuración xwalk, se usan los mismos `component-*.json` de esta rama.
 - **Mock de author:** `…/aem/author/content/futbolemotion/es/home.html` muestra el marcado instrumentado que recibe UE.
 
