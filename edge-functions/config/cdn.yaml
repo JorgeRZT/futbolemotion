@@ -1,0 +1,13 @@
+kind: 'CDN'
+version: '1'
+data:
+  originSelectors:
+    rules:
+      # Pages composed in AEM Sites are rendered at the edge; everything else goes to Edge Delivery
+      - name: aem-pages-to-edge-function
+        when:
+          reqProperty: path
+          in: ["/example-from-aem-and-commerce"]
+        action:
+          type: selectAemOrigin
+          originName: edgefunction-fe-aem-render

@@ -1,0 +1,20 @@
+{
+  "type": "module",
+  "dependencies": {
+    "@fastly/js-compute": "^3.46.0",
+    "mustache": "^4.2.0"
+  },
+  "scripts": {
+    "build": "aio aem edge-functions build",
+    "deploy": "aio aem edge-functions deploy",
+    "test": "mocha"
+  },
+  "devDependencies": {
+    "mocha": "12.0.0-beta-9.2"
+  },
+  "overrides": {
+    "esbuild": ">=0.28.1",
+    "@bytecodealliance/weval": "^0.5.0"
+  },
+  "name": "futbolemotion-edge-functions"
+}

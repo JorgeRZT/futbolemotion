@@ -1,0 +1,20 @@
+# Local runtime for `aio aem edge-functions serve` (Fastly Compute / Viceroy)
+# https://www.fastly.com/documentation/reference/compute/fastly-toml
+
+authors = []
+description = "Fútbol Emotion: render AEM Sites pages at the edge for Edge Delivery Services"
+language = "javascript"
+manifest_version = 3
+name = "futbolemotion-edge-functions"
+service_id = ""
+
+[scripts]
+  post_init = "npm install"
+
+[local_server]
+  [local_server.config_stores]
+    [local_server.config_stores.config_default]
+      format = "inline-toml"
+    [local_server.config_stores.config_default.contents]
+      LOG_LEVEL = "info"
+      PASSTHROUGH = "true"

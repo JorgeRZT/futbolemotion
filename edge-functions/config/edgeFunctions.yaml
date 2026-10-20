@@ -1,0 +1,5 @@
+kind: "EdgeFunctions"
+version: "1"
+data:
+  functions:
+    - name: fe-aem-render
