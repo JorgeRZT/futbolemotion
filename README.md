@@ -1,10 +1,11 @@
-# Fútbol Emotion · Edge Delivery Services + AEM Sites + Adobe Commerce (rama `aem`)
+# Fútbol Emotion · Edge Delivery Services + AEM Sites + Adobe Commerce (rama `edge`)
 
 Demo de la home de [futbolemotion.com](https://www.futbolemotion.com) migrada a **Experience Workspace (Edge Delivery Services + DA)**.
 
 | Rama | Contenido | Preview |
 |---|---|---|
 | `main` | Migración de la landing con contenido en DA. **Congelada.** | https://main--futbolemotion--jorgerzt.aem.page/ |
+| `edge` | Igual que `aem`, pero la página de AEM se renderiza con **AEM Edge Functions** en el CDN de Adobe, en lugar de con json2html | Ver [AEM Edge Functions](#aem-edge-functions-rama-edge) |
 | `aem` | Mismo código, más la composición y el contenido servidos desde AEM Sites (simulado), productos de Adobe Commerce y edición en Universal Editor | https://aem--futbolemotion--jorgerzt.aem.page/ |
 
 > Demo con `noindex, nofollow`. Nada está publicado en `.aem.live`.
@@ -69,6 +70,60 @@ Demo de la home de [futbolemotion.com](https://www.futbolemotion.com) migrada a 
   - se ignoran los tests de `plugins/experimentation`;
   - stylelint: se desactiva `no-descending-specificity` y se unifica un selector duplicado en el footer.
 - El workflow de CI pasa en verde.
+
+## AEM Edge Functions (rama `edge`)
+
+La función `fe-aem-render` (en [`edge-functions/`](edge-functions/)) hace en el **CDN de Adobe** lo mismo que json2html. Se ejecuta en Fastly Compute, delante de EDS.
+
+```
+navegador → Adobe CDN ── /example-from-aem-and-commerce ──► Edge Function fe-aem-render
+                 │                                          ├─ GET modelo de la página en AEM (mock)
+                 │                                          ├─ GET /templates/aem-page.html  (origen EDS)
+                 │                                          ├─ GET /head.html                (origen EDS)
+                 │                                          └─ Mustache → HTML completo (cache 300 s)
+                 └── resto de rutas ───────────────────────► Edge Delivery Services (DA)
+```
+
+| | json2html (rama `aem`) | Edge Function (rama `edge`) |
+|---|---|---|
+| Dónde se renderiza | Worker de Adobe, en el momento del **preview** | CDN de Adobe, en **cada petición** (con caché) |
+| Cuándo se ven los cambios de AEM | Después de lanzar preview o publish | Al caducar la caché (300 s) o tras un purge |
+| Código propio | Solo la plantilla | Plantilla y función JS (control total: personalización, cabeceras, fallback) |
+| Requisitos | Overlay en el content source | Cloud Manager (add-on EDS), dominio propio con Adobe Managed CDN |
+| URL de prueba | `aem.page` | Dominio propio (no funciona en `aem.page` ni en `aem.live`) |
+
+**Qué hace la función** ([`src/index.js`](edge-functions/src/index.js), [`src/render.js`](edge-functions/src/render.js)):
+- Solo atiende las rutas que están en `AEM_PAGES` y que el CDN le envía según `config/cdn.yaml`.
+- Pide en paralelo el modelo de AEM, la plantilla y `head.html`. Cachea las subpeticiones 60 s y la página 300 s.
+- Si AEM falla, devuelve la página guardada en EDS (DA / json2html), así que la web nunca se queda caída.
+- Cabeceras de respuesta: `x-rendered-by: aem-edge-function`, `x-aem-source: <ruta AEM>`, `x-robots-tag: noindex`.
+- Se configura en el config store `config_default`: `EDS_ORIGIN`, `AEM_MODEL_URL`, `TEMPLATE`, `AEM_PAGES`, `CACHE_TTL` y `PASSTHROUGH` (este último solo en local).
+- El código de la función no se publica en EDS: `edge-functions/` está en `.hlxignore` y en `.eslintignore`.
+
+### Probarlo en local
+```bash
+npm install --prefix ~/.local/aio @adobe/aio-cli          # o: npm i -g @adobe/aio-cli
+export PATH=~/.local/aio/node_modules/.bin:$PATH
+aio plugins install @adobe/aio-cli-plugin-aem-edge-functions
+cd edge-functions && npm install && npm test
+aio aem edge-functions build
+aio aem edge-functions serve                               # http://127.0.0.1:7676
+```
+- Abre http://127.0.0.1:7676/example-from-aem-and-commerce. La página se renderiza en la función; el resto (CSS, JS, `nav`, `footer`) se pide al origen `edge--futbolemotion--jorgerzt.aem.page` gracias a `PASSTHROUGH=true`.
+- Comprueba las cabeceras: `curl -sI http://127.0.0.1:7676/example-from-aem-and-commerce | grep x-`
+- Cambia el JSON del mock en my-custom-api y recarga: en local el cambio aparece en unos 60 s, **sin lanzar preview**.
+
+### Desplegar en Adobe CDN (requiere Cloud Manager)
+1. Cloud Manager → programa con el add-on de **Edge Delivery Services** → pestaña *Edge Delivery*:
+   - añadir el sitio con origen `https://edge--futbolemotion--jorgerzt.aem.live/`;
+   - añadir un dominio propio, su certificado SSL y el registro DNS, y mapearlo al CDN gestionado por Adobe.
+2. Ejecuta `aio aem edge-functions setup` y elige el programa, *Edge Delivery Services* y el sitio. Se crea `.aio`, que no se versiona.
+3. Crea un pipeline de configuración de Edge Delivery que apunte a este repo, rama `edge`, ubicación `edge-functions/config`. Despliega `edgeFunctions.yaml` y `cdn.yaml`.
+4. Ejecuta `aio aem edge-functions build && aio aem edge-functions deploy fe-aem-render` (rol *Deployment Manager*).
+5. Comprueba con `curl -I https://<dominio>/example-from-aem-and-commerce`: debe incluir `x-rendered-by: aem-edge-function`.
+6. Para ver al momento un cambio de AEM: `aio aem edge-functions purge-cache`. Para ver los logs: `aio aem edge-functions tail-logs`.
+
+> Producción necesita publicar la página en `.aem.live`, al menos como respaldo, y que el CDN apunte al origen `.live`. En esta demo nada está publicado todavía.
 
 ## Endpoints simulados (my-custom-api)
 
@@ -140,6 +195,7 @@ aem up               # http://localhost:3000 (la página del overlay se sirve de
 ```
 
 ## Pendiente
+- **Rama `edge`:** conseguir un programa de Cloud Manager con el add-on de EDS y un dominio propio para desplegar `fe-aem-render`.
 - Conectar un entorno real de **AEM author** (xwalk) y sustituir el mock por el endpoint de AEM, añadiendo `forwardHeaders: ["Authorization"]` en json2html.
 - Conectar un entorno real de **Adobe Commerce / Catalog Service** y activar los drop-ins en los bloques de producto.
 - Mover la resolución de productos en el servidor a AEM o App Builder: hoy viene ya resuelta en el mock.

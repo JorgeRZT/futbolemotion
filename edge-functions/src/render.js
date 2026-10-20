@@ -1,5 +1,8 @@
 import Mustache from 'mustache';
 
+const ENTITIES = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
+Mustache.escape = (text) => String(text).replace(/[&<>"']/g, (c) => ENTITIES[c]);
+
 // Builds the full EDS page: AEM page model + Mustache template, with the site's head.html injected,
 // the same markup the EDS pipeline would deliver, so blocks decorate as usual in the browser.
 export function renderPage({ model, template, head }) {

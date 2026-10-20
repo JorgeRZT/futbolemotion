@@ -18,3 +18,5 @@ service_id = ""
     [local_server.config_stores.config_default.contents]
       LOG_LEVEL = "info"
       PASSTHROUGH = "true"
+      # content is only previewed in this demo; production origin is the .aem.live one
+      EDS_ORIGIN = "https://edge--futbolemotion--jorgerzt.aem.page"
